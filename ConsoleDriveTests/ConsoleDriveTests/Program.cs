@@ -23,13 +23,14 @@ namespace GoogleDriveDownloader
         /// <param name="args"></param>
         static void Main(string[] args)
         {
-            Pull();
+            //If you don't want to search for anything put in null, otherwise insert a string of what you want to search for.
+            Pull(null);
         }
 
         /// <summary>
         /// Pulls all of the files that are not shared from the shared Google Drive.
         /// </summary>
-        private static void Pull()
+        private static void Pull(string content)
         {
             UserCredential credential = GoogleWebAuthorizationBroker.AuthorizeAsync(
                 new ClientSecrets
@@ -60,6 +61,10 @@ namespace GoogleDriveDownloader
             FileList files = listRequest.Execute();
             IEnumerable<File> daFiles = files.Items;
             daFiles = daFiles.Where(x => x.Shared == false && x.Shared != null).ToList();
+            if (content != null)
+            {
+                daFiles = daFiles.Where(x => x.Title.Contains(content)).ToList();
+            }
             Console.WriteLine("Percentage Complete:\n0%");
             long? totalDownloadSize = 0;
             double currentPercent = 0;
